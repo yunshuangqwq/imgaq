@@ -1,0 +1,43 @@
+// pages/index.js
+import { useState } from 'react';
+
+export default function Home() {
+  const [file, setFile] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('key', process.env.YPAPI_KEY); // 确保 API_KEY 是环境变量
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert('Upload successful!');
+        console.log(data);
+      } else {
+        alert('Upload failed: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Upload error');
+    }
+  };
+
+  return (
+    <div>
+      <h1>Upload Image</h1>
+      <form onSubmit={handleSubmit}>
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        <button type="submit">Upload</button>
+      </form>
+    </div>
+  );
+}
